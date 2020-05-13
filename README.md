@@ -1,6 +1,5 @@
 # Website Scraper
-Website scraper that returns Title, Type, and OG tags of any URL
-
+Website scraper that returns og:title, og:type, and og:url
 # Task Below
 
 A team needs to be able to get some metadata for a given url. They provided the following project spec:
