@@ -6,7 +6,6 @@ const url = "http://hugopakula.com";
 //use axios get html of url 
 axios.get(url)
     .then(response => {
-        console.log(response.data)
         getData(response.data)
     })
     .catch (error => {
@@ -14,8 +13,7 @@ axios.get(url)
     })
 
 //parse html with cheerio
-let getData = html => {
-    data = [];
+function getData(html) {
     const $ = cheerio.load(html);
     //find all meta tags with the property of ":og", and log them out in an object. (is this an object? Or does it just look like one...)
     $('meta[property^="og:"]').each(function(i) {
