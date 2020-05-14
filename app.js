@@ -18,7 +18,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/scrape', function(req, res) {
-    
+    res.send(req.query.url);
 });
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
