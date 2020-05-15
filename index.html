@@ -20,7 +20,13 @@
         <input type="submit" id="submit">
     </form>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="getJSON.js"></script>
+    <script>
+        $("#submit").click(async function() {
+            var data = await $.get('/scrape?url=http://grahambillington.com', (data) => {
+                console.log(data);
+            })
+        })
+    </script>
 </body>
 
 </html>

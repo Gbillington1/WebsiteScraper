@@ -86,7 +86,7 @@ app.get('/scrape', function(req, res) {
             res.send(JSON.stringify(urlData));
         })
         .catch(function(error) {
-            console.error(error);
+            console.log(error);
         })
 });
 
