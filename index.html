@@ -32,9 +32,49 @@
                     // Log the response data in our console. This SHOULD be a JSON string...
                     urlData = JSON.parse(data);
 
-                    // TODO: Parse the JSON string to make it a Javascript object
-                    // TODO: console.log() the values in our response object
-                    console.log(urlData)
+                    $("#dataWrapper").empty();
+
+                    //add title to page
+                    if (urlData.title) {
+                        var titleH4 = document.createElement('h4')
+                        $("#dataWrapper").append(titleH4);
+                        titleH4.innerHTML = "Title: " + urlData.title;
+                    }
+
+                    //add OG data to page
+                    if (urlData.ogData) {
+                        var txt = "OG Data: ";
+                        var keys = Object.keys(urlData.ogData);
+                        var values = Object.values(urlData.ogData)
+                        var ogH4 = document.createElement('h4')
+                        $("#dataWrapper").append(ogH4);
+                        $(keys).each((i) => {
+                            txt += keys[i] + " = " + values[i] + ", ";
+                        })
+                        ogH4.innerHTML = txt;
+                    }
+
+                    //add h1's to page
+                    if (urlData.h1) {
+                        var txt = 'H1: ';
+                        var h1H4 = document.createElement('h4')
+                        $("#dataWrapper").append(h1H4);
+                        for (var i in urlData.h1) {
+                            txt += urlData.h1[i] + ", ";
+                        }
+                        h1H4.innerHTML = txt;
+                    }
+
+                    // add h2's to page
+                    if (urlData.h2) {
+                        var txt = 'H2: ';
+                        var h2H4 = document.createElement('h4')
+                        $("#dataWrapper").append(h2H4);
+                        for (var i in urlData.h2) {
+                            txt += urlData.h2[i] + ", ";
+                        }
+                        h2H4.innerHTML = txt;
+                    }
                 });
             })
         </script>
