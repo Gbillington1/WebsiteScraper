@@ -1,10 +1,11 @@
 const express = require('express');
 const app = express();
-const port = 3001;
+const port = 3000;
 const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 
+//serve html page
 app.get('/', function (req, res) {
     fs.readFile("./index.html", function(err, data) {
         if (err) {
@@ -20,8 +21,15 @@ app.get('/', function (req, res) {
 });
 
 app.get('/scrape', function(req, res) {
+    //save URL
+    var pattern = /^((http|https|ftp):\/\/)/;
     var scrapeUrl = req.query.url;
+    //if url doesn't match pattern, add http:// to the url
+    if (!pattern.test(scrapeUrl)) {
+        scrapeUrl = "http://" + req.query.url;
+    }
 
+    // done :)
     // TODO: Validate scrapeUrl is a parseable URL and not garbage data
     //  Axios will FAIL when requests are not "fully formed". See the below chart:
     // INVALID google.com
