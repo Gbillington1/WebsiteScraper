@@ -1,32 +1,42 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <title>Website Scraper</title> 
+        <meta charset="utf-8">
 
-<head>
-    <title>Website Scraper</title>
-    <meta charset="utf-8">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>Web Scraper</h1>
+        <p>Enter a URL below, and click <code>Submit</code> to scrape.</p>
+        <!--We no longer need the action or method attributes. See the javascript handler for the form-->
+        <!--<form action="/scrape" method="get" id="scraper">-->
+        <form id="scraper">
+            <label for="url">URL: </label>
+            <input type="text" name="url" id="url" placeholder="Enter URL here">
+            <input type="submit" id="submit">
+        </form>
 
-    <style>
+        <div id="dataWrapper"></div>
 
-    </style>
+        <script>
+            $("#scraper").submit(function(e) {
+                // preventDefault prevents normal form execution (i.e. page redirecting, etc) and runs our Javascript instead
+                e.preventDefault();
 
-</head>
+                var scrapeUrl = $('#url').val();
+                var urlData;
 
-<body>
-    <h1>Web Scraper</h1>
-    <p>Enter a URL below, and click <code>Submit</code> to scrape.</p>
-    <form action="/scrape" method="get">
-        <label for="url">URL: </label>
-        <input type="text" name="url" id="url" placeholder="Enter URL here">
-        <input type="submit" id="submit">
-    </form>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        $("#submit").click(async function() {
-            var data = await $.get('/scrape?url=http://grahambillington.com', (data) => {
-                console.log(data);
+                // Make the call to our /scrape endpoint
+                $.get("/scrape", {'url': scrapeUrl}, function(data, status) {
+                    // Log the response data in our console. This SHOULD be a JSON string...
+                    urlData = JSON.parse(data);
+
+                    // TODO: Parse the JSON string to make it a Javascript object
+                    // TODO: console.log() the values in our response object
+                    console.log(urlData)
+                });
             })
-        })
-    </script>
-</body>
-
+        </script>
+    </body>
 </html>
