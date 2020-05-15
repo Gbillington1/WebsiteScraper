@@ -4,18 +4,33 @@
         <title>Website Scraper</title> 
         <meta charset="utf-8">
 
-        <style>
-
-        </style>
-
+        <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
     <body>
         <h1>Web Scraper</h1>
         <p>Enter a URL below, and click <code>Submit</code> to scrape.</p>
-        <form action="/scrape" method="get">
+        <!--We no longer need the action or method attributes. See the javascript handler for the form-->
+        <!--<form action="/scrape" method="get" id="scraper">-->
+        <form id="scraper">
             <label for="url">URL: </label>
             <input type="text" name="url" id="url" placeholder="Enter URL here">
             <input type="submit" id="submit">
         </form>
+
+        <script>
+            $("#scraper").submit(function(e) {
+                // preventDefault prevents normal form execution (i.e. page redirecting, etc) and runs our Javascript instead
+                e.preventDefault();
+
+                // Make the call to our /scrape endpoint
+                $.get("/scrape", {'url': 'http://grahambillington.com/'}, function(data, status) {
+                    // Log the response data in our console. This SHOULD be a JSON string...
+                    console.log(data);
+
+                    // TODO: Parse the JSON string to make it a Javascript object
+                    // TODO: console.log() the values in our response object
+                });
+            })
+        </script>
     </body>
 </html>
