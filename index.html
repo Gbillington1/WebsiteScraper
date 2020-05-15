@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Website Scraper</title> 
-        <meta charset="utf-8">
 
-        <style>
+<head>
+    <title>Website Scraper</title>
+    <meta charset="utf-8">
 
-        </style>
+    <style>
 
-    </head>
-    <body>
-        <h1>Web Scraper</h1>
-        <p>Enter a URL below, and click <code>Submit</code> to scrape.</p>
-        <form action="/scrape" method="get">
-            <label for="url">URL: </label>
-            <input type="text" name="url" id="url" placeholder="Enter URL here">
-            <input type="submit" id="submit">
-        </form>
-    </body>
+    </style>
+
+</head>
+
+<body>
+    <h1>Web Scraper</h1>
+    <p>Enter a URL below, and click <code>Submit</code> to scrape.</p>
+    <form action="/scrape" method="get">
+        <label for="url">URL: </label>
+        <input type="text" name="url" id="url" placeholder="Enter URL here">
+        <input type="submit" id="submit">
+    </form>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="getJSON.js"></script>
+</body>
+
 </html>
