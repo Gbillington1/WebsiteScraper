@@ -62,7 +62,24 @@ app.get('/scrape', function(req, res) {
             });
 
             // TODO: Add <h1>/<h2> tags to urlData object
+            $('h1').each(function(i) {
 
+                if (typeof urlData.h1 === 'undefined') {
+                    urlData.h1 = {};
+                }
+
+                //adds all h1's to urlData
+                urlData.h1[i] = $(this).text();  
+            })
+            $('h2').each(function(i) {
+
+                if (typeof urlData.h2 === 'undefined') {
+                    urlData.h2 = {};
+                }
+
+                //adds all h1's to urlData
+                urlData.h2[i] = $(this).text();  
+            })
             // By putting our data into JSON, we can decode it in the AJAX response on the frontend by using:
             // JSON.parse(responseData)
             // TODO: implement JSON.parse() on frontend to display the urlData object nicely
