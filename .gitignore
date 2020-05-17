@@ -3,3 +3,6 @@
 
 # node_modules
 src/node_modules/**
+
+# Postgres data
+dev-services/postgres/data/pgdata/**
