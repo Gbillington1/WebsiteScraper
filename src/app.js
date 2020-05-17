@@ -1,11 +1,17 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = parseInt(process.env.EXPOSED_PORT);
 const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
+const { Client } = require('pg');
 
-app.use('/scrape', express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
+
+const client = new Client({
+    connectionString: "postgres://root:pass@postgres:5432/scraper"
+});
+client.connect();
 
 //serve html page
 app.get('/', function (req, res) {
@@ -23,6 +29,22 @@ app.get('/', function (req, res) {
 });
 
 app.post('/scrape', function(req, res) {
+    try {
+        client.query('SELECT * FROM scrapes where id = $1', [1], function (err, result) {
+            if (err) {
+                console.log(err);
+                res.status(400).send(err);
+            }
+            res.status(200).send(result.rows);
+        });
+    } catch(e) {
+        console.log(e);
+        res.send({'error': true});
+    }
+
+
+    return;
+
     //save URL
     var pattern = /^((http|https|ftp):\/\/)/;
     var scrapeUrl = req.body.url;
