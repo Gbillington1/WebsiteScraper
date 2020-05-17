@@ -5,6 +5,8 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 
+app.use('/scrape', express.urlencoded({ extended: true }));
+
 //serve html page
 app.get('/', function (req, res) {
     fs.readFile("./index.html", function(err, data) {
@@ -20,13 +22,13 @@ app.get('/', function (req, res) {
     });
 });
 
-app.get('/scrape', function(req, res) {
+app.post('/scrape', function(req, res) {
     //save URL
     var pattern = /^((http|https|ftp):\/\/)/;
-    var scrapeUrl = req.query.url;
+    var scrapeUrl = req.body.url;
     //if url doesn't match pattern, add http:// to the url
     if (!pattern.test(scrapeUrl)) {
-        scrapeUrl = "http://" + req.query.url;
+        scrapeUrl = "http://" + scrapeUrl;
     }
 
     // done :)
@@ -69,7 +71,7 @@ app.get('/scrape', function(req, res) {
                 }
 
                 //adds all h1's to urlData
-                urlData.h1[i] = $(this).text();  
+                urlData.h1[i] = $(this).text();
             })
             $('h2').each(function(i) {
 
@@ -78,7 +80,7 @@ app.get('/scrape', function(req, res) {
                 }
 
                 //adds all h1's to urlData
-                urlData.h2[i] = $(this).text();  
+                urlData.h2[i] = $(this).text();
             })
             // By putting our data into JSON, we can decode it in the AJAX response on the frontend by using:
             // JSON.parse(responseData)
