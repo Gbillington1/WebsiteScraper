@@ -1,17 +1,32 @@
 # Website Scraper
-Website scraper that returns og:title, og:type, and og:url
-# Task Below
+Website scraper that returns social graph data
 
-A team needs to be able to get some metadata for a given url. They provided the following project spec:
+## Prerequisites
 
-- Given a link, call it `url`, scrape the html at the link
-- Parse the html from `url` as a DOM document and return the following tags from a function in a JavaScript object with whatever keys you desire:
-	- Page `<title>`
-	- `title`, `type`, and `url` [OG Tags](https://ogp.me/) (where available)
-	- First occurence of `<h1>` or `<h2>`
-- **Optionally:** add the above data to a `<div>` tag on the page for a nice preview
+You MUST have the following things properly installed and setup on your development device.
 
-### Requirements
+* [Git](https://git-scm.com/)
+* [Docker](https://docker.com)
+* [npm](https://npmjs.com)
 
-- Commit code to a Github repository so it can be included in the microservice and collaborated on
-- Any frameworks can be used, but document any non-vanilla JS and why you decided to use it in a `README.md` file
+## Installing for Development
+
+* `git clone <repository-url>` this repository
+* `cd` into the directory
+* `docker-compose up` to initialize and build web service and Postgres DB
+* `ctrl+c` to stop server. Run `npm install` to load dependencies, and run `docker-compose up` to have the volume with updated files be applied
+
+## Running in Development
+
+All you need is Docker!
+
+To start your development service, `cd {this directory}` and run:
+
+```
+docker-compose up
+```
+
+You should now be able to access the API service at `http://localhost:8080`.
+
+When making functional changes, push final artifacts to the `master` branch.
+
