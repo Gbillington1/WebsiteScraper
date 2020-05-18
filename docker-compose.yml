@@ -20,6 +20,7 @@ services:
     restart: always
     volumes:
     - ./dev-services/postgres/data/pgdata:/var/lib/postgresql/data
+    - ./dev-services/postgres/data/seed.sql:/docker-entrypoint-initdb.d/aa-seed.sql # Prefix with aa since they are run in alphabetical order
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: pass
