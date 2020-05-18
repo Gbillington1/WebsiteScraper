@@ -30,3 +30,8 @@ You should now be able to access the API service at `http://localhost:8080`.
 
 When making functional changes, push final artifacts to the `master` branch.
 
+## Database
+This project uses the Docker postgres image to maintain a local database. When you initially build the docker-compose
+project, the database will be seeded with data. If you need to re-seed, you can empty the `./dev-services/postgres/data/pgdata` directory
+and run `docker-compose up` again.
+
