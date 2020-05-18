@@ -5,6 +5,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const { Client } = require('pg');
+const scrapes = require('./models/scrapes');
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -29,22 +30,6 @@ app.get('/', function (req, res) {
 });
 
 app.post('/scrape', function(req, res) {
-    try {
-        client.query('SELECT * FROM scrapes where id = $1', [1], function (err, result) {
-            if (err) {
-                console.log(err);
-                res.status(400).send(err);
-            }
-            res.status(200).send(result.rows);
-        });
-    } catch(e) {
-        console.log(e);
-        res.send({'error': true});
-    }
-
-
-    return;
-
     //save URL
     var pattern = /^((http|https|ftp):\/\/)/;
     var scrapeUrl = req.body.url;
@@ -53,14 +38,26 @@ app.post('/scrape', function(req, res) {
         scrapeUrl = "http://" + scrapeUrl;
     }
 
-    // done :)
-    // TODO: Validate scrapeUrl is a parseable URL and not garbage data
-    //  Axios will FAIL when requests are not "fully formed". See the below chart:
-    // INVALID google.com
-    // INVALID google.com/imghp
-    // VALID   http://google.com
-    // VALID   https://google.com
-    // VALID   https://google.com/imghp
+    scrapes.getScrape(client, scrapeUrl, function(rows, error) {
+        if(typeof error !== "undefined") {
+            res.send({'error': true});
+
+            return;
+        }
+
+        if(rows.length === 0) {
+            // There are no crawls for the provided URL yet
+            // TODO: Crawl the url here
+            //  save the crawl data in the database
+
+            return;
+        }
+
+        console.log(rows);
+
+        // There is a crawl
+        // TODO: Return the crawl data in the same format
+    });
 
     //use axios get html of url
     axios.get(scrapeUrl)
