@@ -20,6 +20,11 @@ function getScrape(client, url, callback) {
 
 // TODO: Add addScrape
 
+function addScrape() {
+
+}
+
 module.exports = {
-    'getScrape': getScrape
+    'getScrape': getScrape,
+    'addScrape': addScrape
 };

@@ -7,12 +7,18 @@ const fs = require('fs');
 const { Client } = require('pg');
 const scrapes = require('./models/scrapes');
 
+// ??
 app.use(express.urlencoded({ extended: true }));
 
+//connect to DB 
 const client = new Client({
     connectionString: "postgres://root:pass@postgres:5432/scraper"
 });
-client.connect();
+
+client
+    .connect()
+    .then(() => console.log('connected'))
+    .catch(err => console.error('error', err.stack));
 
 //serve html page
 app.get('/', function (req, res) {
@@ -95,7 +101,7 @@ app.post('/scrape', function (req, res) {
                     
                     // send data in JSON
                     // I want to send it to the DB, not to the page
-                    res.send(JSON.stringify(urlData));
+                    // client.addScrape();
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -107,7 +113,7 @@ app.post('/scrape', function (req, res) {
 
         // There is a crawl
         // TODO: Return the crawl data in the same format
-        // return JSON.stringify(urlData);
+        
     });
 
 
