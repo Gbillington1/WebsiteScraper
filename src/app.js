@@ -7,7 +7,6 @@ const fs = require('fs');
 const { Client } = require('pg');
 const scrapes = require('./models/scrapes');
 
-// ??
 app.use(express.urlencoded({ extended: true }));
 
 //connect to DB 
@@ -44,17 +43,15 @@ app.post('/scrape', function (req, res) {
         scrapeUrl = "http://" + scrapeUrl;
     }
 
-    scrapes.getScrape(client, scrapeUrl, function (rows, error) {
+    scrapes.getScrape(client, scrapeUrl).then(function (rows, error) {
         if (typeof error !== "undefined") {
             res.send({ 'error': true });
-
+            
             return;
         }
 
         // if there are no rows in the db => scrape
         if (rows.length === 0) {
-
-            // save the crawl data in the database
 
             //use axios get html of url
             axios.get(scrapeUrl)
@@ -128,14 +125,13 @@ app.post('/scrape', function (req, res) {
 
                         })
                     }
-
                     // add data to DB
-                    scrapes.addScrape(client, scrapeUrl, DBdata, function (result, err) {
-                        delete DBdata.crawl_id;
-                        delete DBdata.raw_url;
-                        delete DBdata.created_at;
-                        res.send(DBdata)
-                    });
+                    scrapes.addScrape(client, scrapeUrl, DBdata)
+                    delete DBdata.crawl_id;
+                    delete DBdata.raw_url;
+                    delete DBdata.created_at;
+                    res.send(DBdata);
+                    
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -152,6 +148,8 @@ app.post('/scrape', function (req, res) {
         // TODO: Return the crawl data in the same format
         res.send(rows[0]);
 
+    }).catch(function (err) {
+        console.error(err);
     });
 
 

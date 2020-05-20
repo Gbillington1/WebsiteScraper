@@ -1,33 +1,21 @@
-function getScrape(client, url, callback) {
+function getScrape(client, url) {
     // TODO: Rewrite to use promises vs callback
-
-    try {
-        client.query('SELECT * FROM crawls where raw_url = $1', [url], function (err, result) {
-            if(err) {
-                console.log(err);
-                callback(null, err);
-
-                return;
+    return new Promise(function (resolve, reject) {
+        client.query('SELECT * FROM crawls where raw_url = $1', [url], function (err, response) {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(response.rows)
             }
-
-            callback(result.rows);
-        });
-    } catch(e) {
-        console.log(e);
-        callback(null, e);
-    }
+        })
+    })
 }
 
 // TODO: Add addScrape
-function addScrape(client, url, data, callback) {
+function addScrape(client, url, data) {
+
     client.query('INSERT INTO crawls (raw_url, title, description, image, favicon) VALUES ($1, $2, $3, $4, $5)', [url, data.title, data.description, data.image, data.favicon])
-        .then((res) => {
-            callback(res.rowCount);
-        })
-        .catch(err => {
-            console.error(err);
-            callback(null, err);
-        })  
+
 }
 
 module.exports = {
