@@ -129,11 +129,12 @@ app.post('/scrape', function (req, res) {
                         })
                     }
 
-                    console.log('favicon: ' + DBdata.favicon)
-
                     // add data to DB
                     scrapes.addScrape(client, scrapeUrl, DBdata, function (result, err) {
-                        res.send(JSON.stringify(DBdata))
+                        delete DBdata.crawl_id;
+                        delete DBdata.raw_url;
+                        delete DBdata.created_at;
+                        res.send(DBdata)
                     });
                 })
                 .catch(function (error) {
