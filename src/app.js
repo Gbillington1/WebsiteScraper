@@ -51,57 +51,90 @@ app.post('/scrape', function (req, res) {
             return;
         }
 
-        // if there are no rows in the db (for this url?) => scrape
+        // if there are no rows in the db => scrape
         if (rows.length === 0) {
-            // There are no crawls for the provided URL yet
-            // TODO: Crawl the url here
+
             // save the crawl data in the database
-            
+
             //use axios get html of url
             axios.get(scrapeUrl)
                 .then(function (response) {
-                    var urlData = {};
+                    var DBdata = {};
 
                     // Load our data into cheerio for DOM parsing
                     const $ = cheerio.load(response.data);
+
                     //find all meta tags with the property of ":og", and log them out in an object
                     $('meta[property^="og:"]').each(function () {
-                        if (typeof urlData.ogData === 'undefined') {
-                            urlData.ogData = {};
-                        }
+                        switch ($(this).attr("property")) {
+                            case 'og:title':
 
-                        urlData.ogData[$(this).attr("property")] = $(this).attr("content");
+                                DBdata.title = $(this).attr("content");
+
+                                break;
+                            case 'og:description':
+
+                                DBdata.description = $(this).attr("content");
+
+                                break;
+                            case 'og:image':
+
+                                DBdata.image = $(this).attr("content");
+
+                                break;
+                        }
                     });
 
-                    $('head title').each(function () {
-                        // There should only be one <title> tag, use the first as our title value
-                        if (typeof urlData.title === 'undefined') {
-                            urlData.title = $(this).text();
+                    if (typeof DBdata.title === 'undefined') {
+                        $('head title').each(function () {
+                            if (typeof DBdata.title === 'undefined') {
+                                // There should only be one <title> tag, use the first as our title value
+                                DBdata.title = $(this).text();
+                            }
+                        });
+                    }
+
+                    //populate the description
+                    if (typeof DBdata.description === 'undefined') {
+                        $('p').each(function () {
+
+                            if (typeof DBdata.description === 'undefined') {
+                                DBdata.description = $(this).text();
+                            }
+                        })
+
+                        if (typeof DBdata.description === 'undefined') {
+                            $('h2').each(function () {
+
+                                if (typeof DBdata.description === 'undefined') {
+                                    DBdata.description = $(this).text();
+                                }
+
+                            })
                         }
+
+                    }
+
+                    if (typeof DBdata.favicon === 'undefined') {
+                        //changing from 'head link' to 'head link[rel]' fixed the issue I texted you about, any idea why?
+                        $('head link[rel]').each(function() {
+
+                            if ($(this).attr('rel') === 'icon' && 
+                                typeof DBdata.favicon === 'undefined') {
+
+                                DBdata.favicon = $(this).attr('href');
+
+                            }
+
+                        })
+                    }
+
+                    console.log('favicon: ' + DBdata.favicon)
+
+                    // add data to DB
+                    scrapes.addScrape(client, scrapeUrl, DBdata, function (result, err) {
+                        res.send(JSON.stringify(DBdata))
                     });
-
-                    $('h1').each(function (i) {
-
-                        if (typeof urlData.h1 === 'undefined') {
-                            urlData.h1 = {};
-                        }
-
-                        //adds all h1's to urlData
-                        urlData.h1[i] = $(this).text();
-                    })
-                    $('h2').each(function (i) {
-
-                        if (typeof urlData.h2 === 'undefined') {
-                            urlData.h2 = {};
-                        }
-
-                        //adds all h1's to urlData
-                        urlData.h2[i] = $(this).text();
-                    })
-                    
-                    // send data in JSON
-                    // I want to send it to the DB, not to the page
-                    // client.addScrape();
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -109,11 +142,15 @@ app.post('/scrape', function (req, res) {
             return;
         }
 
-        console.log(rows);
+        // TODO: remove key from exsiting object
+        delete rows[0].crawl_id;
+        delete rows[0].raw_url;
+        delete rows[0].created_at;
 
         // There is a crawl
         // TODO: Return the crawl data in the same format
-        
+        res.send(rows[0]);
+
     });
 
 

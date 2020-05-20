@@ -19,9 +19,16 @@ function getScrape(client, url, callback) {
 }
 
 // TODO: Add addScrape
-
-function addScrape() {
-
+//add favicon 
+function addScrape(client, url, data, callback) {
+    client.query('INSERT INTO crawls (raw_url, title, description, image, favicon) VALUES ($1, $2, $3, $4, $5)', [url, data.title, data.description, data.image, data.favicon])
+        .then((res) => {
+            callback(res.rowCount);
+        })
+        .catch(err => {
+            console.error(err);
+            callback(null, err);
+        })  
 }
 
 module.exports = {
