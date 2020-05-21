@@ -18,7 +18,12 @@ function addScrape(client, url, data) {
 
 }
 
+function updateScrape(client, url, data) {
+    client.query('UPDATE crawls SET title = $1, description = $2, image = $3, favicon = $4 WHERE raw_url = $5', [data.title, data.description, data.image, data.favicon, url])
+}
+
 module.exports = {
     'getScrape': getScrape,
-    'addScrape': addScrape
+    'addScrape': addScrape,
+    'updateScrape': updateScrape
 };

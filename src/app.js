@@ -124,18 +124,19 @@ app.post('/scrape', function (req, res) {
                             }
 
                         })
-                    }
-                    // add data to DB
+                    };
+
                     scrapes.addScrape(client, scrapeUrl, DBdata)
                     delete DBdata.crawl_id;
                     delete DBdata.raw_url;
                     delete DBdata.created_at;
-                    res.send(DBdata);
+                    res.send(DBdata)
 
                 })
                 .catch(function (error) {
                     console.log(error);
                 })
+
             return;
         } else {
             var dateCreated = rows[0].created_at.toLocaleDateString()
@@ -226,13 +227,14 @@ app.post('/scrape', function (req, res) {
                                 }
 
                             })
-                        }
-                        // add data to DB
-                        scrapes.addScrape(client, scrapeUrl, DBdata)
+                        };
+
+                        // update data in DB
+                        scrapes.updateScrape(client, scrapeUrl, DBdata)
                         delete DBdata.crawl_id;
                         delete DBdata.raw_url;
                         delete DBdata.created_at;
-                        res.send(DBdata);
+                        res.send(DBdata)
 
                     })
                     .catch(function (error) {
