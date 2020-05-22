@@ -17,3 +17,5 @@ All changes made after 05/20/2020 will be documented in this file.
  - Image and Favicon paths are checked, if they are relative, they are made absolute
  - Wrapped the paths in `<a>` tags (on the frontend)
  - Cleaned up code and added comments 
+ - last_modified column
+ - Trigger that updates the last_modified timestamp when any column is updated

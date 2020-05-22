@@ -145,7 +145,7 @@ app.post('/scrape', function (req, res) {
                                 DBdata.favicon = $(this).attr('href');
 
                                 // add '/' to the beginning of the path if there isn't one
-                                if (DBdata.favicon.charAt(0) !== '/') {
+                                if (!DBdata.favicon.charAt(0) === '/') {
                                     DBdata.favicon = '/' + DBdata.favicon;
                                 }
 
@@ -177,11 +177,16 @@ app.post('/scrape', function (req, res) {
 
             // if the url has been scraped before
         } else {
-            // get the date that the url was scraped (in MM/DD/YYYY format)
-            var dateCreated = rows[0].created_at.toLocaleDateString()
+            // get the most recent date that the url was scraped (in MM/DD/YYYY format)
+            var lastModified;
+            if (!rows[0].last_modified == 'null') {
+                lastModified = rows[0].last_modified.toLocaleDateString()
+            } else {
+                lastModified = rows[0].created_at.toLocaleDateString()
+            }
 
             // get today's date
-            var currentDate = new Date("August 14, 2020");
+            var currentDate = new Date();
             // get current month (month of today's date)
             var month = currentDate.getMonth();
             // set the month of currentDate to one month ago
@@ -195,7 +200,7 @@ app.post('/scrape', function (req, res) {
             var oneMonthAgo = currentDate.toLocaleDateString()
 
             // if the url was scraped longer than 1 month ago, scrape again
-            if (dateCreated < oneMonthAgo) {
+            if (lastModified < oneMonthAgo) {
 
                 //use axios get html of url
                 axios.get(scrapeUrl)
@@ -280,7 +285,7 @@ app.post('/scrape', function (req, res) {
                                     DBdata.favicon = $(this).attr('href');
 
                                     // add '/' to the beginning of the path if there isn't one
-                                    if (DBdata.favicon.charAt(0) !== '/') {
+                                    if (!DBdata.favicon.charAt(0) === '/') {
                                         DBdata.favicon = '/' + DBdata.favicon;
                                     }
 
