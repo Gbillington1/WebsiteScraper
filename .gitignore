@@ -1,4 +1,8 @@
-node_modules/**
-
 # IntelliJ files
 .idea
+
+# node_modules
+src/node_modules/**
+
+# Postgres data
+dev-services/postgres/data/pgdata/**

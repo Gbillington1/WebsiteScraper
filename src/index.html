@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Website Scraper</title>
+    <meta charset="utf-8">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <h1>Web Scraper</h1>
+    <p>Enter a URL below, and click <code>Submit</code> to scrape.</p>
+    <!--We no longer need the action or method attributes. See the javascript handler for the form-->
+    <!--<form action="/scrape" method="get" id="scraper">-->
+    <form id="scraper">
+        <label for="url">URL: </label>
+        <input type="text" name="url" id="url" placeholder="Enter URL here">
+        <input type="submit" id="submit">
+    </form>
+
+    <div id="dataWrapper"></div>
+
+    <script>
+        $("#scraper").submit(function (e) {
+            // preventDefault prevents normal form execution (i.e. page redirecting, etc) and runs our Javascript instead
+            e.preventDefault();
+
+            var scrapeUrl = $('#url').val();
+
+            // Make the call to our /scrape endpoint
+            $.post("/scrape", { 'url': scrapeUrl }, function (data, status) {
+
+                $("#dataWrapper").empty();
+
+                // //add title to page
+                if (data.title) {
+                    var titleH4 = document.createElement('h4')
+                    $("#dataWrapper").append(titleH4);
+                    titleH4.innerHTML = "Title: " + data.title;
+                }
+
+                //add description to page
+                if (data.description) {
+                    var descH4 = document.createElement('h4')
+                    $("#dataWrapper").append(descH4);
+                    descH4.innerHTML = "Description: " + data.description;
+                }
+
+                //add image to page
+                if (data.image) {
+                    var imgH4 = document.createElement('h4')
+                    $("#dataWrapper").append(imgH4);
+                    imgH4.innerHTML = "Image: " + "<a href='" + data.image + "' target='_blank'>" + data.image + "</a>";
+                }
+
+                // add favicon to page
+                if (data.favicon) {
+                    var favH4 = document.createElement('h4')
+                    $("#dataWrapper").append(favH4);
+                    favH4.innerHTML = "Favicon: " + data.favicon;
+                    favH4.innerHTML = "Favicon: " + "<a href='" + data.favicon + "' target='_blank'>" + data.favicon + "</a>";
+                }
+            });
+        })
+    </script>
+</body>
+
+</html>

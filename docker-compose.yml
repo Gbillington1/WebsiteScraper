@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  scraper:
+    build: .
+    ports:
+      - 8080:8080
+    volumes:
+    - ./src:/home/node/app
+    environment:
+      - EXPOSED_PORT=8080
+    external_links:
+      - scraper
+    depends_on:
+      - postgres
+  postgres:
+    build: ./dev-services/postgres
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+    - ./dev-services/postgres/data/pgdata:/var/lib/postgresql/data
+    - ./dev-services/postgres/data/seed.sql:/docker-entrypoint-initdb.d/aa-seed.sql # Prefix with aa since they are run in alphabetical order
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: scraper
+      # PGDATA: /var/lib/postgresql/data # The default location for DB Data
