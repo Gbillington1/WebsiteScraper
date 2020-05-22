@@ -34,15 +34,24 @@ app.get('/', function (req, res) {
     });
 });
 
+//recieve post request
 app.post('/scrape', function (req, res) {
     //save URL
     var pattern = /^((http|https|ftp):\/\/)/;
     var scrapeUrl = req.body.url;
-    //if url doesn't match pattern, add http:// to the url
+
+    //if url is relative => add 'http://'
     if (!pattern.test(scrapeUrl)) {
         scrapeUrl = "http://" + scrapeUrl;
     }
 
+    // if url ends with '/', remove it 
+    console.log(scrapeUrl)
+    if (scrapeUrl.charAt(scrapeUrl.length - 1) === '/') {
+        scrapeUrl = scrapeUrl.substring(0, scrapeUrl.length - 1);
+    }
+
+    // pull data of scrape url from DB
     scrapes.getScrape(client, scrapeUrl).then(function (rows, error) {
         if (typeof error !== "undefined") {
             res.send({ 'error': true });
@@ -50,7 +59,7 @@ app.post('/scrape', function (req, res) {
             return;
         }
 
-        // if there are no rows in the db => scrape
+        // if the url hasn't been scraped before
         if (rows.length === 0) {
 
             //use axios get html of url
@@ -76,18 +85,30 @@ app.post('/scrape', function (req, res) {
                                 break;
                             case 'og:image':
 
-                                DBdata.image = $(this).attr("content");
+                                DBdata.image = $(this).attr('content');
 
+                                // add '/' to the beginning of the link if there isn't one
+                                if (!DBdata.image.charAt(0) === '/') {
+                                    DBdata.image = '/' + DBdata.image;
+                                }
+
+                                // make the path absolute if it is relative
+                                if (!pattern.test($(this).attr('content'))) {
+                                    DBdata.image = scrapeUrl + DBdata.image;
+                                }
                                 break;
                         }
                     });
 
                     if (typeof DBdata.title === 'undefined') {
                         $('head title').each(function () {
+
+                            //if title hasn't been assigned yet
                             if (typeof DBdata.title === 'undefined') {
                                 // There should only be one <title> tag, use the first as our title value
                                 DBdata.title = $(this).text();
                             }
+
                         });
                     }
 
@@ -112,24 +133,39 @@ app.post('/scrape', function (req, res) {
 
                     }
 
+                    // populate favicon
                     if (typeof DBdata.favicon === 'undefined') {
                         //changing from 'head link' to 'head link[rel]' fixed the issue I texted you about, any idea why?
                         $('head link[rel]').each(function () {
 
+                            // get link tag that has rel='icon'
                             if ($(this).attr('rel') === 'icon' &&
                                 typeof DBdata.favicon === 'undefined') {
 
                                 DBdata.favicon = $(this).attr('href');
+
+                                // add '/' to the beginning of the path if there isn't one
+                                if (DBdata.favicon.charAt(0) !== '/') {
+                                    DBdata.favicon = '/' + DBdata.favicon;
+                                }
+
+                                // make the path absolute if it is relative
+                                if (!pattern.test($(this).attr('href'))) {
+                                    DBdata.favicon = scrapeUrl + DBdata.favicon;
+                                }
 
                             }
 
                         })
                     };
 
+                    // add the data to the DB
                     scrapes.addScrape(client, scrapeUrl, DBdata)
+                    // delete rows that the user doesn't care about
                     delete DBdata.crawl_id;
                     delete DBdata.raw_url;
                     delete DBdata.created_at;
+                    //send data to frontend
                     res.send(DBdata)
 
                 })
@@ -138,23 +174,28 @@ app.post('/scrape', function (req, res) {
                 })
 
             return;
+
+            // if the url has been scraped before
         } else {
+            // get the date that the url was scraped (in MM/DD/YYYY format)
             var dateCreated = rows[0].created_at.toLocaleDateString()
 
-            var currentDate = new Date();
+            // get today's date
+            var currentDate = new Date("August 14, 2020");
+            // get current month (month of today's date)
             var month = currentDate.getMonth();
+            // set the month of currentDate to one month ago
             currentDate.setMonth(currentDate.getMonth() - 1);
+            // if one month ago is still the current month
             while (currentDate.getMonth() === month) {
                 currentDate.setDate(currentDate.setDate() - 1);
             }
 
+            // set oneMonthAgo to the date 1 month ago
             var oneMonthAgo = currentDate.toLocaleDateString()
 
+            // if the url was scraped longer than 1 month ago, scrape again
             if (dateCreated < oneMonthAgo) {
-                console.log('scraping')
-                // BUG: this code adds a new row, but I actually want to update the current row => write and update function in scrapes.js??
-
-                // find a way to only run axios once, repetitive code is a no-go
 
                 //use axios get html of url
                 axios.get(scrapeUrl)
@@ -179,18 +220,30 @@ app.post('/scrape', function (req, res) {
                                     break;
                                 case 'og:image':
 
-                                    DBdata.image = $(this).attr("content");
+                                    DBdata.image = $(this).attr('content');
 
+                                    // add '/' to the beginning of the link if there isn't one
+                                    if (!DBdata.image.charAt(0) === '/') {
+                                        DBdata.image = '/' + DBdata.image;
+                                    }
+
+                                    // make the path absolute if it is relative
+                                    if (!pattern.test($(this).attr('content'))) {
+                                        DBdata.image = scrapeUrl + DBdata.image;
+                                    }
                                     break;
                             }
                         });
 
                         if (typeof DBdata.title === 'undefined') {
                             $('head title').each(function () {
+
+                                //if title hasn't been assigned yet
                                 if (typeof DBdata.title === 'undefined') {
                                     // There should only be one <title> tag, use the first as our title value
                                     DBdata.title = $(this).text();
                                 }
+
                             });
                         }
 
@@ -215,14 +268,26 @@ app.post('/scrape', function (req, res) {
 
                         }
 
+                        // populate favicon
                         if (typeof DBdata.favicon === 'undefined') {
-                            //changing from 'head link' to 'head link[rel]' fixed the issue I texted you about, any idea why?
+
                             $('head link[rel]').each(function () {
 
+                                // get link tag that has rel='icon'
                                 if ($(this).attr('rel') === 'icon' &&
                                     typeof DBdata.favicon === 'undefined') {
 
                                     DBdata.favicon = $(this).attr('href');
+
+                                    // add '/' to the beginning of the path if there isn't one
+                                    if (DBdata.favicon.charAt(0) !== '/') {
+                                        DBdata.favicon = '/' + DBdata.favicon;
+                                    }
+
+                                    // make the path absolute if it is relative
+                                    if (!pattern.test($(this).attr('href'))) {
+                                        DBdata.favicon = scrapeUrl + DBdata.favicon;
+                                    }
 
                                 }
 
@@ -231,31 +296,31 @@ app.post('/scrape', function (req, res) {
 
                         // update data in DB
                         scrapes.updateScrape(client, scrapeUrl, DBdata)
+                        // delete data that the user doesn't care about
                         delete DBdata.crawl_id;
                         delete DBdata.raw_url;
                         delete DBdata.created_at;
+                        // send data to frontend
                         res.send(DBdata)
 
                     })
                     .catch(function (error) {
                         console.log(error);
                     })
+
                 return;
+
+                // if the url was scraped less than a month ago
             } else {
-                console.log('too early to scrape')
+                // delete data that the user doesn't care about
+                delete rows[0].crawl_id;
+                delete rows[0].raw_url;
+                delete rows[0].created_at;
+
+                // send data to frontend
+                res.send(rows[0]);
             }
-
-            // TODO: remove key from exsiting object
-            delete rows[0].crawl_id;
-            delete rows[0].raw_url;
-            delete rows[0].created_at;
-
-            // There is a crawl
-            // TODO: Return the crawl data in the same format
-            res.send(rows[0]);
         }
-
-
     }).catch(function (err) {
         console.error(err);
     });
@@ -263,4 +328,5 @@ app.post('/scrape', function (req, res) {
 
 });
 
+// listen for connection on localhost
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
