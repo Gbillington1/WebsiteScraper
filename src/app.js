@@ -86,8 +86,8 @@ app.post('/scrape', function (req, res) {
 
                                 DBdata.image = $(this).attr('content');
 
-                                // add '/' to the beginning of the link if there isn't one
-                                if (!(DBdata.image.charAt(0) == '/')) {
+                                // add '/' to the beginning of the link if there isn't one && if image is a relative link
+                                if (!(DBdata.image.charAt(0) == '/') && !(pattern.test(DBdata.image))) {
                                     DBdata.image = '/' + DBdata.image;
                                 }
 
@@ -144,7 +144,7 @@ app.post('/scrape', function (req, res) {
                                 DBdata.favicon = $(this).attr('href');
 
                                 // add '/' to the beginning of the path if there isn't one
-                                if (!(DBdata.favicon.charAt(0) == '/')) {
+                                if (!(DBdata.favicon.charAt(0) == '/') && !(pattern.test(DBdata.favicon))) {
                                     DBdata.favicon = '/' + DBdata.favicon;
                                 }
                                 
@@ -227,7 +227,7 @@ app.post('/scrape', function (req, res) {
                                     DBdata.image = $(this).attr('content');
 
                                     // add '/' to the beginning of the link if there isn't one
-                                    if (!(DBdata.image.charAt(0) == '/')) {
+                                    if ((!(DBdata.image.charAt(0) == '/') && !(pattern.test(DBdata.image)))) {
                                         DBdata.image = '/' + DBdata.image;
                                     }
 
@@ -284,7 +284,7 @@ app.post('/scrape', function (req, res) {
                                     DBdata.favicon = $(this).attr('href');
 
                                     // add '/' to the beginning of the path if there isn't one
-                                    if (!(DBdata.favicon.charAt(0) == '/')) {
+                                    if (!(DBdata.favicon.charAt(0) == '/') && !(pattern.test(DBdata.favicon))) {
                                         DBdata.favicon = '/' + DBdata.favicon;
                                     }
 
