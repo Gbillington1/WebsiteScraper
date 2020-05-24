@@ -46,8 +46,7 @@ app.post('/scrape', function (req, res) {
     }
 
     // if url ends with '/', remove it 
-    console.log(scrapeUrl)
-    if (scrapeUrl.charAt(scrapeUrl.length - 1) === '/') {
+    if (scrapeUrl.charAt(scrapeUrl.length - 1) == '/') {
         scrapeUrl = scrapeUrl.substring(0, scrapeUrl.length - 1);
     }
 
@@ -88,7 +87,7 @@ app.post('/scrape', function (req, res) {
                                 DBdata.image = $(this).attr('content');
 
                                 // add '/' to the beginning of the link if there isn't one
-                                if (!DBdata.image.charAt(0) === '/') {
+                                if (!(DBdata.image.charAt(0) == '/')) {
                                     DBdata.image = '/' + DBdata.image;
                                 }
 
@@ -145,10 +144,10 @@ app.post('/scrape', function (req, res) {
                                 DBdata.favicon = $(this).attr('href');
 
                                 // add '/' to the beginning of the path if there isn't one
-                                if (!DBdata.favicon.charAt(0) === '/') {
+                                if (!(DBdata.favicon.charAt(0) == '/')) {
                                     DBdata.favicon = '/' + DBdata.favicon;
                                 }
-
+                                
                                 // make the path absolute if it is relative
                                 if (!pattern.test($(this).attr('href'))) {
                                     DBdata.favicon = scrapeUrl + DBdata.favicon;
@@ -228,7 +227,7 @@ app.post('/scrape', function (req, res) {
                                     DBdata.image = $(this).attr('content');
 
                                     // add '/' to the beginning of the link if there isn't one
-                                    if (!DBdata.image.charAt(0) === '/') {
+                                    if (!(DBdata.image.charAt(0) == '/')) {
                                         DBdata.image = '/' + DBdata.image;
                                     }
 
@@ -285,7 +284,7 @@ app.post('/scrape', function (req, res) {
                                     DBdata.favicon = $(this).attr('href');
 
                                     // add '/' to the beginning of the path if there isn't one
-                                    if (!DBdata.favicon.charAt(0) === '/') {
+                                    if (!(DBdata.favicon.charAt(0) == '/')) {
                                         DBdata.favicon = '/' + DBdata.favicon;
                                     }
 
