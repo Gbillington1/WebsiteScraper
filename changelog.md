@@ -1,6 +1,14 @@
 # Changelog
 All changes made after 05/20/2020 will be documented in this file.
 
+## Unreleased
+### Added
+- [ ] Ability to store crawl history to see changes in site metadata
+
+### Fixed
+- [ ] Change "latest crawl within {x}" to be handled in query
+- [ ] Use helper method `makeCrawl()` to consistently scrape data from web pages
+
 ## 05/20/2020
 ### Added
  - Promise for getScrape
