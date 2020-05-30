@@ -1,7 +1,8 @@
 // returns all data that match scrapeUrl
 function getScrape(client, url) {
     return new Promise(function (resolve, reject) {
-        client.query('SELECT * FROM crawls where raw_url = $1', [url], function (err, response) {
+        // get data where url == url and has been scraped in the last 28 days
+        client.query('SELECT * FROM crawls where raw_url = $1 AND created_at > current_date - interval \'28\' day;', [url], function (err, response) {
             if (err) {
                 reject(err)
             } else {

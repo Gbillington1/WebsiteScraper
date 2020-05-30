@@ -1,25 +1,20 @@
 # Changelog
 All changes made after 05/20/2020 will be documented in this file.
 
-## [Unreleased]
-### Added
-- [x] Ability to store crawl history to see changes in site metadata
-- [x] Function that generates frontend data object from DBdata
-
-### Fixed
-- [ ] Change "latest crawl within {x}" to be handled in query
-- [x] Use helper method `makeCrawl()` to consistently scrape data from web pages
-
 ## [05/30/2020]
 ### Added
  - `getDate()` in place of `setDate()`
  - `makeScrape()` to scrape webpages
  - `makeFrontend()` to create a frontend data object from the data returned by `makeScrape()`
+ - query to return "latest crawl within {x} days"
+ - comments
+ - fixed height for image on frontend
 
 ### Removed
  - `setDate()` 
  - Excess axios code
  - Code that deletes properties from `DBdata`
+ - JS code that calculated dates
 
 ## [05/21/2020]
 ### Added
@@ -43,7 +38,7 @@ All changes made after 05/20/2020 will be documented in this file.
 ## [Before]
 Changes before 05/20/2020 are not logged in this changelog, but you can press [before] to see the commit history.
 
-[Unreleased]: https://github.com/Gbillington1/WebsiteScraper/compare/6872850..HEAD
+[05/30/2020]: https://github.com/Gbillington1/WebsiteScraper/compare/5083693..b5b7594 
 [05/21/2020]: https://github.com/Gbillington1/WebsiteScraper/compare/57bd12d..6872850
 [05/20/2020]: https://github.com/Gbillington1/WebsiteScraper/compare/ef92f98..57bd12d
 [Before]: https://github.com/Gbillington1/WebsiteScraper/compare/4cd8ca9..ef92f98
