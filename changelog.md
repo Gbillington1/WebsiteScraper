@@ -12,10 +12,14 @@ All changes made after 05/20/2020 will be documented in this file.
 
 ## [05/30/2020]
 ### Added
- - getDate() in place of setDate()
+ - `getDate()` in place of `setDate()`
+ - `makeScrape()` to scrape webpages
+ - `makeFrontend()` to create a frontend data object from the data returned by `makeScrape()`
 
 ### Removed
- - setDate() 
+ - `setDate()` 
+ - Excess axios code
+ - Code that deletes properties from `DBdata`
 
 ## [05/21/2020]
 ### Added
