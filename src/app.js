@@ -90,7 +90,7 @@ function makeScrape(scrapeUrl, res) {
                         }
 
                         // make the path absolute if it is relative
-                        if (!pattern.test($(this).attr('content'))) {
+                        if (!pattern.test(DBdata.image)) {
                             DBdata.image = scrapeUrl + DBdata.image;
                         }
                         break;
@@ -147,7 +147,7 @@ function makeScrape(scrapeUrl, res) {
                         }
 
                         // make the path absolute if it is relative
-                        if (!pattern.test($(this).attr('href'))) {
+                        if (!pattern.test(DBdata.favicon)) {
                             DBdata.favicon = scrapeUrl + DBdata.favicon;
                         }
 
