@@ -3,11 +3,23 @@ All changes made after 05/20/2020 will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- [ ] Ability to store crawl history to see changes in site metadata
+- [x] Ability to store crawl history to see changes in site metadata
+- [x] Function that generates frontend data object from DBdata
 
 ### Fixed
 - [ ] Change "latest crawl within {x}" to be handled in query
-- [ ] Use helper method `makeCrawl()` to consistently scrape data from web pages
+- [x] Use helper method `makeCrawl()` to consistently scrape data from web pages
+
+## [05/30/2020]
+### Added
+ - `getDate()` in place of `setDate()`
+ - `makeScrape()` to scrape webpages
+ - `makeFrontend()` to create a frontend data object from the data returned by `makeScrape()`
+
+### Removed
+ - `setDate()` 
+ - Excess axios code
+ - Code that deletes properties from `DBdata`
 
 ## [05/21/2020]
 ### Added
