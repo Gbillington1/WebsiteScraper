@@ -7,7 +7,7 @@ All changes made after 05/20/2020 will be documented in this file.
 - [x] Function that generates frontend data object from DBdata
 
 ### Fixed
-- [ ] Change "latest crawl within {x}" to be handled in query
+- [x] Change "latest crawl within {x}" to be handled in query
 - [x] Use helper method `makeCrawl()` to consistently scrape data from web pages
 
 ## [05/30/2020]
