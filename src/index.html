@@ -51,7 +51,7 @@
                 if (data.image) {
                     var imgH4 = document.createElement('h4')
                     $("#dataWrapper").append(imgH4);
-                    imgH4.innerHTML = "Image: " + "<a href='" + data.image + "' target='_blank'>" + data.image + "</a>";
+                    imgH4.innerHTML = "Image: " + "<img src='" + data.image + "' target='_blank'>" + data.image + "</img>";
                 }
 
                 // add favicon to page
@@ -59,7 +59,7 @@
                     var favH4 = document.createElement('h4')
                     $("#dataWrapper").append(favH4);
                     favH4.innerHTML = "Favicon: " + data.favicon;
-                    favH4.innerHTML = "Favicon: " + "<a href='" + data.favicon + "' target='_blank'>" + data.favicon + "</a>";
+                    favH4.innerHTML = "Favicon: " + "<img src='" + data.favicon + "' target='_blank'>" + data.favicon + "</img>";
                 }
             });
         })

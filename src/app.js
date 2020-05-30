@@ -34,6 +34,145 @@ app.get('/', function (req, res) {
     });
 });
 
+// make the frontend data with data that is passed in
+function makeFrontend(data) {
+    let frontendData = {};
+
+    if (data.title) {
+        frontendData.title = data.title;
+    }
+
+    if (data.description) {
+        frontendData.description = data.description;
+    }
+
+    if (data.image) {
+        frontendData.image = data.image;
+    }
+
+    if (data.favicon) {
+        frontendData.favicon = data.favicon;
+    }
+    
+    return frontendData;
+}
+
+function makeScrape(scrapeUrl, res) {
+    var pattern = /^((http|https|ftp):\/\/)/;
+    var DBdata = {};
+    //use axios get html of url
+    axios.get(scrapeUrl, DBdata)
+        .then(function (response) {
+
+            // Load our data into cheerio for DOM parsing
+            const $ = cheerio.load(response.data);
+
+            //find all meta tags with the property of ":og", and log them out in an object
+            $('meta[property^="og:"]').each(function () {
+                switch ($(this).attr("property")) {
+                    case 'og:title':
+
+                        DBdata.title = $(this).attr("content");
+
+                        break;
+                    case 'og:description':
+
+                        DBdata.description = $(this).attr("content");
+
+                        break;
+                    case 'og:image':
+
+                        DBdata.image = $(this).attr('content');
+
+                        // add '/' to the beginning of the link if there isn't one && if image is a relative link
+                        if (!(DBdata.image.charAt(0) == '/') && !(pattern.test(DBdata.image))) {
+                            DBdata.image = '/' + DBdata.image;
+                        }
+
+                        // make the path absolute if it is relative
+                        if (!pattern.test(DBdata.image)) {
+                            DBdata.image = scrapeUrl + DBdata.image;
+                        }
+                        break;
+                }
+            });
+
+            if (typeof DBdata.title === 'undefined') {
+                $('head title').each(function () {
+
+                    //if title hasn't been assigned yet
+                    if (typeof DBdata.title === 'undefined') {
+                        // There should only be one <title> tag, use the first as our title value
+                        DBdata.title = $(this).text();
+                    }
+
+                });
+            }
+
+            //populate the description
+            if (typeof DBdata.description === 'undefined') {
+                $('p').each(function () {
+
+                    if (typeof DBdata.description === 'undefined') {
+                        DBdata.description = $(this).text();
+                    }
+                })
+
+                if (typeof DBdata.description === 'undefined') {
+                    $('h2').each(function () {
+
+                        if (typeof DBdata.description === 'undefined') {
+                            DBdata.description = $(this).text();
+                        }
+
+                    })
+                }
+
+            }
+
+            // populate favicon
+            if (typeof DBdata.favicon === 'undefined') {
+                //changing from 'head link' to 'head link[rel]' fixed the issue I texted you about, any idea why?
+                $('head link[rel]').each(function () {
+
+                    // get link tag that has rel='icon'
+                    if ($(this).attr('rel') === 'icon' &&
+                        typeof DBdata.favicon === 'undefined') {
+
+                        DBdata.favicon = $(this).attr('href');
+
+                        // add '/' to the beginning of the path if there isn't one
+                        if (!(DBdata.favicon.charAt(0) == '/') && !(pattern.test(DBdata.favicon))) {
+                            DBdata.favicon = '/' + DBdata.favicon;
+                        }
+
+                        // make the path absolute if it is relative
+                        if (!pattern.test(DBdata.favicon)) {
+                            DBdata.favicon = scrapeUrl + DBdata.favicon;
+                        }
+
+                    }
+
+                })
+            };
+
+            // add the data to the DB
+            scrapes.addScrape(client, scrapeUrl, DBdata)
+
+            return DBdata;
+        })
+        // take valuable data out of DBdata and make a frontendData object
+        .then((DBdata) => {
+
+            var frontendData = makeFrontend(DBdata);
+
+            res.send(frontendData);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+}
+
 //recieve post request
 app.post('/scrape', function (req, res) {
     //save URL
@@ -46,7 +185,7 @@ app.post('/scrape', function (req, res) {
     }
 
     // if url ends with '/', remove it 
-    if (scrapeUrl.charAt(scrapeUrl.length - 1) == '/') {
+    if (scrapeUrl.charAt(scrapeUrl.length - 1) === '/') {
         scrapeUrl = scrapeUrl.substring(0, scrapeUrl.length - 1);
     }
 
@@ -61,116 +200,7 @@ app.post('/scrape', function (req, res) {
         // if the url hasn't been scraped before
         if (rows.length === 0) {
 
-            //use axios get html of url
-            axios.get(scrapeUrl)
-                .then(function (response) {
-                    var DBdata = {};
-
-                    // Load our data into cheerio for DOM parsing
-                    const $ = cheerio.load(response.data);
-
-                    //find all meta tags with the property of ":og", and log them out in an object
-                    $('meta[property^="og:"]').each(function () {
-                        switch ($(this).attr("property")) {
-                            case 'og:title':
-
-                                DBdata.title = $(this).attr("content");
-
-                                break;
-                            case 'og:description':
-
-                                DBdata.description = $(this).attr("content");
-
-                                break;
-                            case 'og:image':
-
-                                DBdata.image = $(this).attr('content');
-
-                                // add '/' to the beginning of the link if there isn't one && if image is a relative link
-                                if (!(DBdata.image.charAt(0) == '/') && !(pattern.test(DBdata.image))) {
-                                    DBdata.image = '/' + DBdata.image;
-                                }
-
-                                // make the path absolute if it is relative
-                                if (!pattern.test($(this).attr('content'))) {
-                                    DBdata.image = scrapeUrl + DBdata.image;
-                                }
-                                break;
-                        }
-                    });
-
-                    if (typeof DBdata.title === 'undefined') {
-                        $('head title').each(function () {
-
-                            //if title hasn't been assigned yet
-                            if (typeof DBdata.title === 'undefined') {
-                                // There should only be one <title> tag, use the first as our title value
-                                DBdata.title = $(this).text();
-                            }
-
-                        });
-                    }
-
-                    //populate the description
-                    if (typeof DBdata.description === 'undefined') {
-                        $('p').each(function () {
-
-                            if (typeof DBdata.description === 'undefined') {
-                                DBdata.description = $(this).text();
-                            }
-                        })
-
-                        if (typeof DBdata.description === 'undefined') {
-                            $('h2').each(function () {
-
-                                if (typeof DBdata.description === 'undefined') {
-                                    DBdata.description = $(this).text();
-                                }
-
-                            })
-                        }
-
-                    }
-
-                    // populate favicon
-                    if (typeof DBdata.favicon === 'undefined') {
-                        //changing from 'head link' to 'head link[rel]' fixed the issue I texted you about, any idea why?
-                        $('head link[rel]').each(function () {
-
-                            // get link tag that has rel='icon'
-                            if ($(this).attr('rel') === 'icon' &&
-                                typeof DBdata.favicon === 'undefined') {
-
-                                DBdata.favicon = $(this).attr('href');
-
-                                // add '/' to the beginning of the path if there isn't one
-                                if (!(DBdata.favicon.charAt(0) == '/') && !(pattern.test(DBdata.favicon))) {
-                                    DBdata.favicon = '/' + DBdata.favicon;
-                                }
-                                
-                                // make the path absolute if it is relative
-                                if (!pattern.test($(this).attr('href'))) {
-                                    DBdata.favicon = scrapeUrl + DBdata.favicon;
-                                }
-
-                            }
-
-                        })
-                    };
-
-                    // add the data to the DB
-                    scrapes.addScrape(client, scrapeUrl, DBdata)
-                    // delete rows that the user doesn't care about
-                    delete DBdata.crawl_id;
-                    delete DBdata.raw_url;
-                    delete DBdata.created_at;
-                    //send data to frontend
-                    res.send(DBdata)
-
-                })
-                .catch(function (error) {
-                    console.log(error);
-                })
+            makeScrape(scrapeUrl, res);
 
             return;
 
@@ -201,128 +231,14 @@ app.post('/scrape', function (req, res) {
             // if the url was scraped longer than 1 month ago, scrape again
             if (lastModified < oneMonthAgo) {
 
-                //use axios get html of url
-                axios.get(scrapeUrl)
-                    .then(function (response) {
-                        var DBdata = {};
-
-                        // Load our data into cheerio for DOM parsing
-                        const $ = cheerio.load(response.data);
-
-                        //find all meta tags with the property of ":og", and log them out in an object
-                        $('meta[property^="og:"]').each(function () {
-                            switch ($(this).attr("property")) {
-                                case 'og:title':
-
-                                    DBdata.title = $(this).attr("content");
-
-                                    break;
-                                case 'og:description':
-
-                                    DBdata.description = $(this).attr("content");
-
-                                    break;
-                                case 'og:image':
-
-                                    DBdata.image = $(this).attr('content');
-
-                                    // add '/' to the beginning of the link if there isn't one
-                                    if ((!(DBdata.image.charAt(0) == '/') && !(pattern.test(DBdata.image)))) {
-                                        DBdata.image = '/' + DBdata.image;
-                                    }
-
-                                    // make the path absolute if it is relative
-                                    if (!pattern.test($(this).attr('content'))) {
-                                        DBdata.image = scrapeUrl + DBdata.image;
-                                    }
-                                    break;
-                            }
-                        });
-
-                        if (typeof DBdata.title === 'undefined') {
-                            $('head title').each(function () {
-
-                                //if title hasn't been assigned yet
-                                if (typeof DBdata.title === 'undefined') {
-                                    // There should only be one <title> tag, use the first as our title value
-                                    DBdata.title = $(this).text();
-                                }
-
-                            });
-                        }
-
-                        //populate the description
-                        if (typeof DBdata.description === 'undefined') {
-                            $('p').each(function () {
-
-                                if (typeof DBdata.description === 'undefined') {
-                                    DBdata.description = $(this).text();
-                                }
-                            })
-
-                            if (typeof DBdata.description === 'undefined') {
-                                $('h2').each(function () {
-
-                                    if (typeof DBdata.description === 'undefined') {
-                                        DBdata.description = $(this).text();
-                                    }
-
-                                })
-                            }
-
-                        }
-
-                        // populate favicon
-                        if (typeof DBdata.favicon === 'undefined') {
-
-                            $('head link[rel]').each(function () {
-
-                                // get link tag that has rel='icon'
-                                if ($(this).attr('rel') === 'icon' &&
-                                    typeof DBdata.favicon === 'undefined') {
-
-                                    DBdata.favicon = $(this).attr('href');
-
-                                    // add '/' to the beginning of the path if there isn't one
-                                    if (!(DBdata.favicon.charAt(0) == '/') && !(pattern.test(DBdata.favicon))) {
-                                        DBdata.favicon = '/' + DBdata.favicon;
-                                    }
-
-                                    // make the path absolute if it is relative
-                                    if (!pattern.test($(this).attr('href'))) {
-                                        DBdata.favicon = scrapeUrl + DBdata.favicon;
-                                    }
-
-                                }
-
-                            })
-                        };
-
-                        // update data in DB
-                        scrapes.updateScrape(client, scrapeUrl, DBdata)
-                        // delete data that the user doesn't care about
-                        delete DBdata.crawl_id;
-                        delete DBdata.raw_url;
-                        delete DBdata.created_at;
-                        // send data to frontend
-                        res.send(DBdata)
-
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    })
-
-                return;
+                makeScrape(scrapeUrl, res);
 
                 // if the url was scraped less than a month ago
             } else {
                 // delete data that the user doesn't care about
-                delete rows[0].crawl_id;
-                delete rows[0].raw_url;
-                delete rows[0].created_at;
-
+                let dataForFrontend = makeFrontend(rows[0]);
                 // send data to frontend
-                res.send(rows[0]);
+                res.send(dataForFrontend);
             }
         }
     }).catch(function (err) {
