@@ -38,7 +38,7 @@ All changes made after 05/20/2020 will be documented in this file.
 ## [Before]
 Changes before 05/20/2020 are not logged in this changelog, but you can press [before] to see the commit history.
 
-[05/30/2020]: https://github.com/Gbillington1/WebsiteScraper/compare/5083693..42eec6a
+[05/30/2020]: https://github.com/Gbillington1/WebsiteScraper/compare/5083693..b5b7594 
 [05/21/2020]: https://github.com/Gbillington1/WebsiteScraper/compare/57bd12d..6872850
 [05/20/2020]: https://github.com/Gbillington1/WebsiteScraper/compare/ef92f98..57bd12d
 [Before]: https://github.com/Gbillington1/WebsiteScraper/compare/4cd8ca9..ef92f98
