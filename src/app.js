@@ -192,7 +192,7 @@ app.post('/scrape', function (req, res) {
             currentDate.setMonth(currentDate.getMonth() - 1);
             // if one month ago is still the current month
             while (currentDate.getMonth() === month) {
-                currentDate.setDate(currentDate.setDate() - 1);
+                currentDate.setDate(currentDate.getDate() - 1);
             }
 
             // set oneMonthAgo to the date 1 month ago
