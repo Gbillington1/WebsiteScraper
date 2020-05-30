@@ -53,7 +53,7 @@ function makeFrontend(data) {
     if (data.favicon) {
         frontendData.favicon = data.favicon;
     }
-    
+
     return frontendData;
 }
 
@@ -197,7 +197,7 @@ app.post('/scrape', function (req, res) {
             return;
         }
 
-        // if the url hasn't been scraped before
+        // if the url hasn't been scraped before (no rows in DB)
         if (rows.length === 0) {
 
             makeScrape(scrapeUrl, res);
@@ -206,40 +206,13 @@ app.post('/scrape', function (req, res) {
 
             // if the url has been scraped before
         } else {
-            // get the most recent date that the url was scraped (in MM/DD/YYYY format)
-            var lastModified;
-            if (!rows[0].last_modified == 'null') {
-                lastModified = rows[0].last_modified.toLocaleDateString()
-            } else {
-                lastModified = rows[0].created_at.toLocaleDateString()
-            }
+    
+            // delete data that the user doesn't care about
+            let dataForFrontend = makeFrontend(rows[0]);
 
-            // get today's date
-            var currentDate = new Date();
-            // get current month (month of today's date)
-            var month = currentDate.getMonth();
-            // set the month of currentDate to one month ago
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            // if one month ago is still the current month
-            while (currentDate.getMonth() === month) {
-                currentDate.setDate(currentDate.getDate() - 1);
-            }
+            // send data to frontend
+            res.send(dataForFrontend);
 
-            // set oneMonthAgo to the date 1 month ago
-            var oneMonthAgo = currentDate.toLocaleDateString()
-
-            // if the url was scraped longer than 1 month ago, scrape again
-            if (lastModified < oneMonthAgo) {
-
-                makeScrape(scrapeUrl, res);
-
-                // if the url was scraped less than a month ago
-            } else {
-                // delete data that the user doesn't care about
-                let dataForFrontend = makeFrontend(rows[0]);
-                // send data to frontend
-                res.send(dataForFrontend);
-            }
         }
     }).catch(function (err) {
         console.error(err);
