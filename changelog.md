@@ -3,7 +3,7 @@ All changes made after 05/20/2020 will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- [ ] Ability to store crawl history to see changes in site metadata
+- [x] Ability to store crawl history to see changes in site metadata
 - [x] Function that generates frontend data object from DBdata
 
 ### Fixed

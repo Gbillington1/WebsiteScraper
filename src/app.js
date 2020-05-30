@@ -185,7 +185,6 @@ app.post('/scrape', function (req, res) {
     }
 
     // if url ends with '/', remove it 
-    console.log(scrapeUrl)
     if (scrapeUrl.charAt(scrapeUrl.length - 1) === '/') {
         scrapeUrl = scrapeUrl.substring(0, scrapeUrl.length - 1);
     }
